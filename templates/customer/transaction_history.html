@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% block title %}Transaction History — Bank of Pattanagere{% endblock %}
+{% block page_title %}Transaction History{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <!-- Filters -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8">
+        <form method="GET" action="{{ url_for('customer.transaction_history') }}" class="flex flex-col md:flex-row gap-4 items-end">
+            <div class="flex-1 w-full md:w-auto">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Search Reference</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </div>
+                    <input type="text" name="search" value="{{ search }}" placeholder="Search ID or description"
+                        class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none text-sm transition-all">
+                </div>
+            </div>
+            <div class="w-full md:w-40">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Type</label>
+                <select name="type" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all appearance-none cursor-pointer">
+                    <option value="">All Types</option>
+                    <option value="credit" {% if txn_type == 'credit' %}selected{% endif %}>Credit Only</option>
+                    <option value="debit" {% if txn_type == 'debit' %}selected{% endif %}>Debit Only</option>
+                </select>
+            </div>
+            <div class="w-full md:w-40">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Status</label>
+                <select name="status" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all appearance-none cursor-pointer">
+                    <option value="">All Statuses</option>
+                    <option value="success" {% if status == 'success' %}selected{% endif %}>Success</option>
+                    <option value="failed" {% if status == 'failed' %}selected{% endif %}>Failed</option>
+                </select>
+            </div>
+            <div class="w-full md:w-48">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Sort</label>
+                <select name="sort" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all appearance-none cursor-pointer">
+                    <option value="date_desc" {% if sort_by == 'date_desc' %}selected{% endif %}>Date: Newest First</option>
+                    <option value="date_asc" {% if sort_by == 'date_asc' %}selected{% endif %}>Date: Oldest First</option>
+                    <option value="amount_desc" {% if sort_by == 'amount_desc' %}selected{% endif %}>Amount: Highest First</option>
+                    <option value="amount_asc" {% if sort_by == 'amount_asc' %}selected{% endif %}>Amount: Lowest First</option>
+                </select>
+            </div>
+            <div class="flex gap-2 w-full md:w-auto">
+                <button type="submit" class="flex-1 md:flex-none px-6 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-bold rounded-xl transition-all shadow-subtle hover:shadow-card">Apply</button>
+                <a href="{{ url_for('customer.transaction_history') }}" class="px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-sm font-bold rounded-xl transition-colors flex items-center justify-center" title="Clear Filters">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden">
+        {% if transactions %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="text-left text-xs text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-200">
+                        <th class="px-6 py-4 font-bold">Transaction Ref</th>
+                        <th class="px-6 py-4 font-bold">Description</th>
+                        <th class="px-6 py-4 font-bold">Category</th>
+                        <th class="px-6 py-4 font-bold text-right">Amount</th>
+                        <th class="px-6 py-4 font-bold">Date & Time</th>
+                        <th class="px-6 py-4 font-bold">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for txn in transactions %}
+                    <tr class="hover:bg-slate-50 transition-colors group">
+                        <td class="px-6 py-4">
+                            <span class="font-mono text-sm text-slate-600 group-hover:text-primary transition-colors">{{ txn.transaction_id }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <p class="text-sm font-bold text-slate-800">{{ txn.description }}</p>
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if txn.transaction_type == 'credit' %}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-bold uppercase tracking-wider rounded border border-green-200">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg> Credit
+                            </span>
+                            {% elif txn.transaction_type == 'debit' %}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-50 text-red-700 text-xs font-bold uppercase tracking-wider rounded border border-red-200">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg> Debit
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider rounded border border-blue-200">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg> Transfer
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="text-sm font-bold {% if txn.transaction_type == 'credit' %}text-green-600{% else %}text-slate-800{% endif %} block">
+                                {% if txn.transaction_type == 'credit' %}+{% else %}-{% endif %} ₹{{ '{:,.2f}'.format(txn.amount) }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <p class="text-sm font-medium text-slate-700">{{ txn.created_at.strftime('%d %b %Y') }}</p>
+                            <p class="text-xs text-slate-400 mt-0.5">{{ txn.created_at.strftime('%I:%M %p') }}</p>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 inline-flex items-center gap-1 {% if txn.status == 'success' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %} text-xs font-bold uppercase tracking-wider rounded-full">
+                                {% if txn.status == 'success' %}
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                {% else %}
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                {% endif %}
+                                {{ txn.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if pagination.pages > 1 %}
+        <div class="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-50/50">
+            <p class="text-sm text-slate-500 font-medium">Showing <span class="font-bold text-slate-800">{{ ((pagination.page - 1) * pagination.per_page) + 1 }}</span> to <span class="font-bold text-slate-800">{{ [pagination.page * pagination.per_page, pagination.total]|min }}</span> of <span class="font-bold text-slate-800">{{ pagination.total }}</span> entries</p>
+            <div class="flex gap-2">
+                {% if pagination.has_prev %}
+                <a href="{{ url_for('customer.transaction_history', page=pagination.prev_num, search=search, type=txn_type, status=status, sort=sort_by) }}" class="px-3 py-1.5 bg-white border border-slate-200 hover:border-primary hover:text-primary text-slate-600 font-bold text-sm rounded-lg transition-colors shadow-sm">Previous</a>
+                {% endif %}
+                
+                <div class="hidden sm:flex gap-1">
+                {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                    {% if p %}
+                    <a href="{{ url_for('customer.transaction_history', page=p, search=search, type=txn_type, status=status, sort=sort_by) }}"
+                        class="w-8 h-8 flex items-center justify-center text-sm font-bold rounded-lg transition-colors shadow-sm border {% if p == pagination.page %}bg-primary border-primary text-white{% else %}bg-white border-slate-200 text-slate-600 hover:border-primary hover:text-primary{% endif %}">{{ p }}</a>
+                    {% else %}
+                    <span class="w-8 h-8 flex items-center justify-center text-slate-400">…</span>
+                    {% endif %}
+                {% endfor %}
+                </div>
+
+                {% if pagination.has_next %}
+                <a href="{{ url_for('customer.transaction_history', page=pagination.next_num, search=search, type=txn_type, status=status, sort=sort_by) }}" class="px-3 py-1.5 bg-white border border-slate-200 hover:border-primary hover:text-primary text-slate-600 font-bold text-sm rounded-lg transition-colors shadow-sm">Next</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="p-16 text-center">
+            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-5">
+                <svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">No Transactions Found</h3>
+            <p class="text-slate-500 max-w-md mx-auto">Try adjusting your filters or search criteria. If you haven't made any transactions yet, your history will appear here once you do.</p>
+            {% if search or txn_type or status %}
+            <a href="{{ url_for('customer.transaction_history') }}" class="inline-block mt-6 px-6 py-2.5 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-colors shadow-subtle">Clear All Filters</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

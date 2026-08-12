@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% block title %}Fund Transfer — Bank of Pattanagere{% endblock %}
+{% block page_title %}Fund Transfer{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in">
+    <!-- Transfer Form -->
+    <div class="lg:col-span-8">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-card p-8">
+            <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                </div>
+                Initiate Transfer
+            </h2>
+            
+            <form method="POST" action="{{ url_for('customer.transfer') }}" id="transfer-form" class="space-y-6">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <!-- From Account -->
+                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Transferring From</label>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center border border-slate-200">
+                                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate-800 tracking-wider">{{ account.account_number }}</p>
+                                <p class="text-xs font-medium text-slate-500">{{ account.account_type|capitalize }} Account</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-0.5">Available Balance</p>
+                            <p class="font-bold text-green-600">₹ {{ '{:,.2f}'.format(account.balance) }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- To Account -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1.5">To Account Number <span class="text-red-500">*</span></label>
+                        <input type="text" name="to_account" id="to-account" required placeholder="Enter 12-digit account number"
+                            class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-mono text-sm shadow-sm"
+                            list="beneficiary-list">
+                        <datalist id="beneficiary-list">
+                            {% for ben in beneficiaries %}
+                            <option value="{{ ben.beneficiary_account }}">{{ ben.beneficiary_name }}</option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
+
+                    <!-- Beneficiary Name -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1.5">Beneficiary Name</label>
+                        <input type="text" name="beneficiary_name" id="beneficiary-name" placeholder="Name of the receiver"
+                            class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm shadow-sm">
+                    </div>
+                </div>
+
+                <!-- Amount -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Amount (₹) <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <span class="text-slate-500 font-bold">₹</span>
+                        </div>
+                        <input type="number" name="amount" id="transfer-amount" required min="1" step="0.01" placeholder="0.00"
+                            class="w-full pl-9 pr-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-lg text-slate-800 shadow-sm">
+                    </div>
+                </div>
+
+                <!-- Remarks -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">Remarks (Optional)</label>
+                    <input type="text" name="remarks" id="transfer-remarks" placeholder="e.g., Rent Payment, Bill, etc."
+                        class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm shadow-sm">
+                </div>
+
+                <div class="pt-4 border-t border-slate-100">
+                    <button type="submit"
+                        class="w-full py-3.5 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all duration-200 shadow-card active:scale-[0.99] flex items-center justify-center gap-2 text-lg">
+                        <span>Proceed to Authorize</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </button>
+                    <p class="text-center text-xs text-slate-400 mt-3 flex items-center justify-center gap-1">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+                        Secured by 256-bit encryption
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Transfer Summary -->
+    <div class="lg:col-span-4">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-subtle p-6 sticky top-24">
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-5 border-b border-slate-100 pb-3">Transaction Summary</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <p class="text-xs font-bold text-slate-500 uppercase">From Account</p>
+                    <p class="font-mono font-medium text-slate-800 mt-0.5" id="summary-from">{{ account.account_number }}</p>
+                </div>
+                
+                <div>
+                    <p class="text-xs font-bold text-slate-500 uppercase">To Account</p>
+                    <p class="font-mono font-medium text-slate-800 mt-0.5" id="summary-to">—</p>
+                </div>
+                
+                <div class="pt-3 border-t border-slate-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm text-slate-600 font-medium">Transfer Amount</span>
+                        <span class="font-bold text-slate-800" id="summary-amount">₹ 0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm text-slate-600 font-medium">Processing Fee</span>
+                        <span class="font-bold text-green-600">₹ 0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm text-slate-600 font-medium">Remarks</span>
+                        <span class="text-sm text-slate-800 truncate max-w-[120px]" id="summary-remarks">—</span>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t-2 border-slate-200">
+                    <div class="flex justify-between items-end bg-blue-50 p-4 rounded-xl border border-blue-100">
+                        <span class="font-bold text-primary-dark uppercase text-xs tracking-wider">Total Debit</span>
+                        <span class="font-bold text-2xl text-primary-dark" id="summary-total">₹ 0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PIN Modal -->
+<div id="pin-modal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity opacity-0">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 transform scale-95 transition-transform duration-300">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-blue-50 text-primary rounded-full flex items-center justify-center mx-auto mb-4 ring-8 ring-blue-50/50">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Authorize Transfer</h2>
+            <p class="text-slate-500 text-sm mt-1.5">Enter your 4-digit transaction PIN to confirm</p>
+        </div>
+
+        <div class="bg-slate-50 rounded-xl p-4 mb-6 space-y-2.5 text-sm border border-slate-200">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-200 border-dashed">
+                <span class="text-slate-500 font-medium">To Account</span>
+                <span class="font-mono font-bold text-slate-800" id="modal-to"></span>
+            </div>
+            <div class="flex justify-between items-center pt-1">
+                <span class="text-slate-500 font-medium">Amount</span>
+                <span class="font-bold text-slate-800 text-lg" id="modal-amount"></span>
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <div class="flex justify-center gap-3">
+                <input type="password" maxlength="1" class="pin-input" inputmode="numeric" pattern="\d*" autocomplete="off">
+                <input type="password" maxlength="1" class="pin-input" inputmode="numeric" pattern="\d*" autocomplete="off">
+                <input type="password" maxlength="1" class="pin-input" inputmode="numeric" pattern="\d*" autocomplete="off">
+                <input type="password" maxlength="1" class="pin-input" inputmode="numeric" pattern="\d*" autocomplete="off">
+            </div>
+            <!-- Hidden input to store full PIN -->
+            <input type="hidden" name="transaction_pin" id="full-pin" form="transfer-form">
+        </div>
+
+        <div class="flex gap-3">
+            <button type="button" onclick="closeModal()" class="flex-1 py-3 bg-white border-2 border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-xl transition-colors">Cancel</button>
+            <button type="button" onclick="submitTransfer()" id="confirm-transfer-btn" disabled class="flex-1 py-3 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all shadow-card disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
+                Confirm
+            </button>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    // Live transfer summary update
+    const toAccountInput = document.getElementById('to-account');
+    const amountInput = document.getElementById('transfer-amount');
+    const remarksInput = document.getElementById('transfer-remarks');
+
+    function updateSummary() {
+        document.getElementById('summary-to').textContent = toAccountInput.value || '—';
+        const amt = parseFloat(amountInput.value) || 0;
+        document.getElementById('summary-amount').textContent = '₹ ' + amt.toLocaleString('en-IN', {minimumFractionDigits: 2});
+        document.getElementById('summary-total').textContent = '₹ ' + amt.toLocaleString('en-IN', {minimumFractionDigits: 2});
+        document.getElementById('summary-remarks').textContent = remarksInput.value || '—';
+    }
+
+    toAccountInput.addEventListener('input', updateSummary);
+    amountInput.addEventListener('input', updateSummary);
+    remarksInput.addEventListener('input', updateSummary);
+
+    // PIN Modal Logic
+    const transferForm = document.getElementById('transfer-form');
+    const modal = document.getElementById('pin-modal');
+    const pinBoxes = document.querySelectorAll('.pin-input');
+    const fullPinInput = document.getElementById('full-pin');
+    const confirmBtn = document.getElementById('confirm-transfer-btn');
+
+    transferForm.addEventListener('submit', (e) => {
+        if (!fullPinInput.value || fullPinInput.value.length !== 4) {
+            e.preventDefault();
+            
+            if (!toAccountInput.value || !amountInput.value) return;
+
+            document.getElementById('modal-to').textContent = toAccountInput.value;
+            const amt = parseFloat(amountInput.value) || 0;
+            document.getElementById('modal-amount').textContent = '₹ ' + amt.toLocaleString('en-IN', {minimumFractionDigits: 2});
+            
+            modal.classList.remove('hidden');
+            void modal.offsetWidth; // reflow
+            modal.classList.remove('opacity-0');
+            modal.querySelector('div').classList.remove('scale-95');
+            
+            setTimeout(() => pinBoxes[0].focus(), 100);
+        }
+    });
+
+    pinBoxes.forEach((box, index) => {
+        box.addEventListener('input', (e) => {
+            if (e.target.value.length === 1 && index < pinBoxes.length - 1) {
+                pinBoxes[index + 1].focus();
+            }
+            updatePinState();
+        });
+        box.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                pinBoxes[index - 1].focus();
+            }
+        });
+    });
+
+    function updatePinState() {
+        let pin = '';
+        pinBoxes.forEach(box => pin += box.value);
+        fullPinInput.value = pin;
+        confirmBtn.disabled = pin.length !== 4;
+    }
+
+    function closeModal() {
+        modal.classList.add('opacity-0');
+        modal.querySelector('div').classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            pinBoxes.forEach(box => box.value = '');
+            updatePinState();
+        }, 300);
+    }
+
+    function submitTransfer() {
+        if (fullPinInput.value.length === 4) {
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...';
+            transferForm.submit();
+        }
+    }
+</script>
+{% endblock %}
+{% endblock %}

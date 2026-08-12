@@ -1,0 +1,74 @@
+{% extends 'base_admin.html' %}
+{% block title %}TCP Monitor — Bank of Pattanagere{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-gray-800 mb-6">TCP Server Monitor</h1>
+
+<!-- Server Status -->
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+    <div class="flex items-center gap-3 mb-6">
+        <div class="w-4 h-4 rounded-full {% if stats.is_running %}bg-green-500 animate-pulse{% else %}bg-red-500{% endif %}"></div>
+        <h2 class="text-lg font-bold text-gray-800">Server Status: <span class="{% if stats.is_running %}text-green-600{% else %}text-red-600{% endif %}">{% if stats.is_running %}Running{% else %}Offline{% endif %}</span></h2>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="bg-blue-50 rounded-xl p-5 text-center">
+            <svg class="w-8 h-8 text-blue-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <p class="text-xs text-gray-500 font-medium">Uptime</p>
+            <p class="text-xl font-bold text-gray-800 mt-1">{{ stats.uptime_formatted }}</p>
+        </div>
+
+        <div class="bg-green-50 rounded-xl p-5 text-center">
+            <svg class="w-8 h-8 text-green-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <p class="text-xs text-gray-500 font-medium">Total Connections</p>
+            <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.total_connections }}</p>
+        </div>
+
+        <div class="bg-teal-50 rounded-xl p-5 text-center">
+            <svg class="w-8 h-8 text-teal-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <p class="text-xs text-gray-500 font-medium">Active Clients</p>
+            <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.active_connections }}</p>
+        </div>
+
+        <div class="bg-purple-50 rounded-xl p-5 text-center">
+            <svg class="w-8 h-8 text-purple-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+            <p class="text-xs text-gray-500 font-medium">Total Requests</p>
+            <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.total_requests }}</p>
+        </div>
+
+        <div class="bg-green-50 rounded-xl p-5 text-center">
+            <svg class="w-8 h-8 text-green-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <p class="text-xs text-gray-500 font-medium">Successful Transactions</p>
+            <p class="text-3xl font-bold text-green-600 mt-1">{{ stats.successful_transactions }}</p>
+        </div>
+
+        <div class="bg-red-50 rounded-xl p-5 text-center">
+            <svg class="w-8 h-8 text-red-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <p class="text-xs text-gray-500 font-medium">Failed Transactions</p>
+            <p class="text-3xl font-bold text-red-600 mt-1">{{ stats.failed_transactions }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Connection Info -->
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+    <h3 class="font-bold text-gray-800 mb-3">Connection Details</h3>
+    <div class="space-y-2 text-sm">
+        <div class="flex justify-between py-2 border-b border-gray-100">
+            <span class="text-gray-500">Host</span>
+            <span class="font-mono text-gray-800">127.0.0.1</span>
+        </div>
+        <div class="flex justify-between py-2 border-b border-gray-100">
+            <span class="text-gray-500">Port</span>
+            <span class="font-mono text-gray-800">9999</span>
+        </div>
+        <div class="flex justify-between py-2 border-b border-gray-100">
+            <span class="text-gray-500">Protocol</span>
+            <span class="text-gray-800">TCP / JSON</span>
+        </div>
+        <div class="flex justify-between py-2">
+            <span class="text-gray-500">Threading</span>
+            <span class="text-gray-800">Multi-threaded (1 thread per client)</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

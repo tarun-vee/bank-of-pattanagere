@@ -1,0 +1,85 @@
+{% extends 'base_auth.html' %}
+{% block title %}Login — Bank of Pattanagere{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-2xl shadow-2xl p-8 md:p-10 border border-slate-100 animate-fade-in relative overflow-hidden">
+    <!-- Decorative background element -->
+    <div class="absolute -top-32 -right-32 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 -left-32 w-64 h-64 bg-blue-400/5 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="relative z-10">
+        <!-- Bank Logo -->
+        <div class="text-center mb-10">
+            <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-sm border border-blue-100 relative group">
+                <div class="absolute inset-0 bg-primary/10 rounded-2xl scale-0 group-hover:scale-110 transition-transform duration-300"></div>
+                <svg class="w-8 h-8 text-primary relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l9-4 9 4v2H3V6z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10v8h3v-8M10 10v8h4v-8M17 10v8h3v-8M3 20h18"/>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Bank of Pattanagere</h1>
+            <p class="text-slate-500 text-sm mt-1 font-medium tracking-wide uppercase">Digital Banking</p>
+        </div>
+
+        <div class="text-center mb-8">
+            <h2 class="text-lg font-bold text-slate-800">Welcome Back</h2>
+            <p class="text-slate-500 text-sm mt-1">Please enter your credentials to proceed</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.login') }}" class="space-y-6">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Registered Email</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/></svg>
+                    </div>
+                    <input type="email" name="email" id="login-email" placeholder="Enter your email address" required
+                        class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium text-slate-800">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Password</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    </div>
+                    <input type="password" name="password" id="login-password" placeholder="Enter your password" required
+                        class="w-full pl-11 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium text-slate-800">
+                    <button type="button" onclick="togglePasswordVisibility('login-password', this)" class="absolute inset-y-0 right-0 pr-4 flex items-center group">
+                        <svg class="w-5 h-5 text-slate-400 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <label class="flex items-center gap-2 cursor-pointer group">
+                    <div class="relative flex items-center justify-center w-5 h-5">
+                        <input type="checkbox" name="remember" class="peer appearance-none w-5 h-5 border-2 border-slate-300 rounded focus:ring-2 focus:ring-primary/30 checked:bg-primary checked:border-primary transition-all cursor-pointer">
+                        <svg class="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                    <span class="text-sm font-medium text-slate-600 group-hover:text-slate-800 transition-colors">Remember me</span>
+                </label>
+                <a href="{{ url_for('auth.forgot_password') }}" class="text-sm font-bold text-primary hover:text-primary-dark transition-colors">Forgot Password?</a>
+            </div>
+
+            <div class="pt-2">
+                <button type="submit" id="login-btn"
+                    class="w-full py-3.5 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all duration-200 shadow-card hover:shadow-lg hover:shadow-primary/30 active:scale-[0.98] flex items-center justify-center gap-2">
+                    <span>Secure Login</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+            <p class="text-sm text-slate-500 font-medium">
+                Don't have an account yet?
+                <a href="{{ url_for('auth.register') }}" class="font-bold text-primary hover:text-primary-dark transition-colors inline-block ml-1">Open an Account</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'base_admin.html' %}
+{% block title %}Reports — Bank of Pattanagere{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-gray-800 mb-6">Reports</h1>
+
+<!-- Report Type Selector -->
+<div class="flex flex-wrap gap-2 mb-6">
+    {% for rt, label in [('daily','Daily'), ('monthly','Monthly'), ('transfer_volume','Transfer Volume'), ('frozen','Frozen Accounts'), ('inactive','Inactive Accounts'), ('top_customers','Top Customers')] %}
+    <a href="{{ url_for('admin.reports', report=rt) }}" class="px-4 py-2 rounded-xl text-sm font-medium transition-colors {% if report_type == rt %}bg-primary text-white{% else %}bg-white text-gray-700 border border-gray-200 hover:bg-gray-50{% endif %}">{{ label }}</a>
+    {% endfor %}
+</div>
+
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+    <h2 class="text-lg font-bold text-gray-800 mb-4">{{ data.get('title', 'Report') }}</h2>
+
+    {% if report_type in ['daily', 'monthly', 'transfer_volume'] %}
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        <div class="bg-blue-50 rounded-xl p-4 text-center">
+            <p class="text-xs text-gray-500">Total Transactions</p>
+            <p class="text-xl font-bold text-gray-800">{{ data.get('total_transactions', data.get('total_transfers', 0)) }}</p>
+        </div>
+        <div class="bg-green-50 rounded-xl p-4 text-center">
+            <p class="text-xs text-gray-500">Total Amount</p>
+            <p class="text-xl font-bold text-gray-800">₹ {{ '{:,.2f}'.format(data.get('total_amount', data.get('total_volume', 0))) }}</p>
+        </div>
+        {% if 'successful' in data %}
+        <div class="bg-green-50 rounded-xl p-4 text-center">
+            <p class="text-xs text-gray-500">Successful</p>
+            <p class="text-xl font-bold text-green-600">{{ data.successful }}</p>
+        </div>
+        <div class="bg-red-50 rounded-xl p-4 text-center">
+            <p class="text-xs text-gray-500">Failed</p>
+            <p class="text-xl font-bold text-red-600">{{ data.failed }}</p>
+        </div>
+        {% endif %}
+    </div>
+    {% if data.get('transactions') %}
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead><tr class="text-left text-xs text-gray-500 uppercase bg-gray-50"><th class="px-4 py-2.5 font-semibold">ID</th><th class="px-4 py-2.5 font-semibold">Type</th><th class="px-4 py-2.5 font-semibold">Amount</th><th class="px-4 py-2.5 font-semibold">Description</th><th class="px-4 py-2.5 font-semibold">Date</th></tr></thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for txn in data.transactions[:30] %}
+                <tr class="text-sm hover:bg-gray-50/50">
+                    <td class="px-4 py-2.5 font-medium">{{ txn.transaction_id }}</td>
+                    <td class="px-4 py-2.5"><span class="px-2 py-0.5 text-xs font-semibold rounded-full {% if txn.transaction_type == 'credit' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">{{ txn.transaction_type|capitalize }}</span></td>
+                    <td class="px-4 py-2.5 font-medium">₹ {{ '{:,.2f}'.format(txn.amount) }}</td>
+                    <td class="px-4 py-2.5 text-gray-600">{{ txn.description[:40] }}</td>
+                    <td class="px-4 py-2.5 text-gray-500">{{ txn.created_at.strftime('%d %b %Y') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    {% elif report_type in ['frozen', 'inactive'] %}
+    <p class="text-sm text-gray-600 mb-4">Total: <strong>{{ data.get('total', 0) }}</strong> accounts</p>
+    {% if data.get('accounts') %}
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead><tr class="text-left text-xs text-gray-500 uppercase bg-gray-50"><th class="px-4 py-2.5 font-semibold">Account</th><th class="px-4 py-2.5 font-semibold">Holder</th><th class="px-4 py-2.5 font-semibold">Balance</th><th class="px-4 py-2.5 font-semibold">Status</th></tr></thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for acc in data.accounts %}
+                <tr class="text-sm hover:bg-gray-50/50">
+                    <td class="px-4 py-2.5 font-medium">{{ acc.account_number }}</td>
+                    <td class="px-4 py-2.5">{{ acc.user.name }}</td>
+                    <td class="px-4 py-2.5 font-medium">₹ {{ '{:,.2f}'.format(acc.balance) }}</td>
+                    <td class="px-4 py-2.5"><span class="px-2 py-0.5 text-xs font-semibold rounded-full {% if acc.status == 'active' %}bg-green-100 text-green-700{% elif acc.status == 'frozen' %}bg-red-100 text-red-700{% else %}bg-yellow-100 text-yellow-700{% endif %}">{{ acc.status|capitalize }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-gray-500 text-sm text-center py-8">No accounts found for this report.</p>
+    {% endif %}
+
+    {% elif report_type == 'top_customers' %}
+    {% if data.get('customers') %}
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead><tr class="text-left text-xs text-gray-500 uppercase bg-gray-50"><th class="px-4 py-2.5 font-semibold">#</th><th class="px-4 py-2.5 font-semibold">Customer</th><th class="px-4 py-2.5 font-semibold">Account</th><th class="px-4 py-2.5 font-semibold">Transaction Volume</th></tr></thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for item in data.customers %}
+                <tr class="text-sm hover:bg-gray-50/50">
+                    <td class="px-4 py-2.5 font-medium">{{ loop.index }}</td>
+                    <td class="px-4 py-2.5 font-medium">{{ item.account.user.name }}</td>
+                    <td class="px-4 py-2.5">{{ item.account.account_number }}</td>
+                    <td class="px-4 py-2.5 font-bold text-primary">₹ {{ '{:,.2f}'.format(item.volume) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-gray-500 text-sm text-center py-8">No data available.</p>
+    {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

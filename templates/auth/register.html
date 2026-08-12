@@ -1,0 +1,108 @@
+{% extends 'base_auth.html' %}
+{% block title %}Register — Bank of Pattanagere{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-2xl shadow-2xl p-8 md:p-10 border border-slate-100 animate-fade-in relative overflow-hidden">
+    <div class="relative z-10">
+        <div class="text-center mb-8">
+            <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-100">
+                <svg class="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Create an Account</h1>
+            <p class="text-slate-500 text-sm mt-1.5 font-medium">Join Bank of Pattanagere today</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.register') }}" class="space-y-6">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="space-y-4">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Personal Details</h3>
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Full Legal Name <span class="text-red-500">*</span></label>
+                    <input type="text" name="name" required placeholder="As it appears on your ID"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Email Address <span class="text-red-500">*</span></label>
+                        <input type="email" name="email" required placeholder="your@email.com"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Phone Number <span class="text-red-500">*</span></label>
+                        <input type="tel" name="phone" required placeholder="10-digit mobile number"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Residential Address</label>
+                    <input type="text" name="address" placeholder="Full residential address"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium">
+                </div>
+            </div>
+
+            <div class="space-y-4 pt-4">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Account setup</h3>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Account Type <span class="text-red-500">*</span></label>
+                    <select name="account_type" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium appearance-none">
+                        <option value="savings">Savings Account (Recommended)</option>
+                        <option value="current">Current Account (Business)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="space-y-4 pt-4">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Security</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Login Password <span class="text-red-500">*</span></label>
+                        <input type="password" name="password" id="reg-password" required placeholder="Min 8 characters"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium">
+                        <div id="password-strength" class="mt-2 h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                            <div id="password-strength-bar" class="h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Confirm Password <span class="text-red-500">*</span></label>
+                        <input type="password" name="confirm_password" required placeholder="Repeat password"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Transaction PIN <span class="text-red-500">*</span></label>
+                        <input type="password" name="transaction_pin" required placeholder="••••" pattern="\d{4}" maxlength="4"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-xl tracking-[0.5em] text-center font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Confirm PIN <span class="text-red-500">*</span></label>
+                        <input type="password" name="confirm_transaction_pin" required placeholder="••••" pattern="\d{4}" maxlength="4"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-xl tracking-[0.5em] text-center font-mono">
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-6">
+                <button type="submit"
+                    class="w-full py-4 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all duration-200 shadow-card hover:shadow-lg active:scale-[0.99] text-lg">
+                    Submit Application
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+            <p class="text-sm text-slate-500 font-medium">
+                Already hold an account?
+                <a href="{{ url_for('auth.login') }}" class="font-bold text-primary hover:text-primary-dark transition-colors inline-block ml-1">Login Here</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

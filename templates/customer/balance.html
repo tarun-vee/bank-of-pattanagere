@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Balance Inquiry — Bank of Pattanagere{% endblock %}
+{% block page_title %}Balance Inquiry{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto animate-fade-in mt-8">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden">
+        <div class="bg-gradient-to-r from-primary to-primary-dark p-8 text-center relative overflow-hidden">
+            <!-- Background Decoration -->
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-white opacity-5 rounded-full blur-2xl"></div>
+            <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-white opacity-5 rounded-full blur-2xl"></div>
+            
+            <p class="text-sm text-blue-200 font-bold uppercase tracking-widest relative z-10">Available Balance</p>
+            <h2 class="text-5xl font-bold text-white mt-3 tracking-tight drop-shadow-md relative z-10">
+                ₹ {{ '{:,.2f}'.format(account.balance if account else 0) }}
+            </h2>
+            <div class="mt-6 inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full border border-white/20 relative z-10">
+                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                <span class="text-xs text-white font-medium">Live Balance</span>
+            </div>
+        </div>
+        
+        <div class="p-8">
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-5">Account Details</h3>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center pb-4 border-b border-slate-100">
+                    <span class="text-sm text-slate-500 font-medium">Account Number</span>
+                    <span class="font-mono text-slate-800 font-bold tracking-wider">{{ account.account_number if account else 'N/A' }}</span>
+                </div>
+                <div class="flex justify-between items-center pb-4 border-b border-slate-100">
+                    <span class="text-sm text-slate-500 font-medium">Account Type</span>
+                    <span class="font-bold text-slate-800">{{ (account.account_type|capitalize + ' Account') if account else 'N/A' }}</span>
+                </div>
+                <div class="flex justify-between items-center pb-4 border-b border-slate-100">
+                    <span class="text-sm text-slate-500 font-medium">Status</span>
+                    <span class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-md border 
+                        {% if account and account.status == 'active' %}bg-green-50 text-green-700 border-green-200
+                        {% elif account and account.status == 'pending' %}bg-amber-50 text-amber-700 border-amber-200
+                        {% else %}bg-red-50 text-red-700 border-red-200{% endif %}">
+                        {{ account.status if account else 'N/A' }}
+                    </span>
+                </div>
+            </div>
+
+            {% if tcp_response and tcp_response.status == 'success' %}
+            <div class="mt-6 bg-blue-50 rounded-xl p-4 border border-blue-100 flex items-start gap-3">
+                <div class="mt-0.5">
+                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-blue-900">Secure Core Verification</p>
+                    <p class="text-xs text-blue-700 mt-0.5">Balance successfully verified directly with the TCP Core Banking System.</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="mt-8 text-center">
+                <a href="{{ url_for('customer.dashboard') }}" class="text-sm font-bold text-primary hover:text-primary-dark transition-colors">Return to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — Bank of Pattanagere{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Welcome Banner -->
+<div class="mb-8 animate-fade-in">
+    <p class="text-slate-500 font-medium text-sm">Welcome back,</p>
+    <div class="flex items-center gap-4 mt-1">
+        <h1 class="text-3xl font-bold text-slate-800 tracking-tight">{{ current_user.name }}</h1>
+        {% if account and account.status == 'pending' %}
+        <span class="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-bold uppercase tracking-wider rounded-full shadow-sm">Pending Approval</span>
+        {% elif account and account.status == 'frozen' %}
+        <span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold uppercase tracking-wider rounded-full shadow-sm">Account Frozen</span>
+        {% else %}
+        <span class="px-3 py-1 bg-blue-100 text-primary text-xs font-bold uppercase tracking-wider rounded-full shadow-sm">Premium Customer</span>
+        {% endif %}
+    </div>
+</div>
+
+{% if account and account.status == 'pending' %}
+<div class="bg-amber-50 border-l-4 border-amber-500 rounded-r-xl p-5 mb-8 shadow-subtle animate-fade-in" style="animation-delay: 0.1s;">
+    <div class="flex items-center gap-4">
+        <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div>
+            <h3 class="font-bold text-amber-900">Account Pending Approval</h3>
+            <p class="text-sm text-amber-700 mt-0.5">Your account is currently under review by our administrative team. Full banking features will be unlocked shortly.</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Account Info Cards -->
+{% if account %}
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-10 animate-fade-in" style="animation-delay: 0.1s;">
+    
+    <!-- Primary Digital Banking Card -->
+    <div class="xl:col-span-2 banking-card p-6 flex flex-col justify-between min-h-[160px]">
+        <div class="flex justify-between items-start z-10">
+            <div>
+                <p class="text-blue-200 text-xs font-medium uppercase tracking-widest mb-1">Available Balance</p>
+                <h2 class="text-3xl font-bold text-white tracking-tight">₹ {{ '{:,.2f}'.format(account.balance) }}</h2>
+            </div>
+            <svg class="w-8 h-8 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+        </div>
+        <div class="mt-8 z-10">
+            <p class="font-mono text-lg tracking-[0.2em] text-white/90">{{ account.account_number[:4] }} {{ account.account_number[4:8] }} {{ account.account_number[8:] }}</p>
+            <div class="flex justify-between items-end mt-2">
+                <p class="text-sm font-medium text-blue-100 uppercase tracking-wide">{{ current_user.name }}</p>
+                <p class="text-xs font-bold text-white uppercase tracking-wider bg-white/20 px-2 py-1 rounded">{{ account.account_type }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Card -->
+    <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-card flex flex-col justify-center">
+        <div class="flex items-center gap-4 mb-4">
+            <div class="w-12 h-12 {% if account.status == 'active' %}bg-green-100{% elif account.status == 'pending' %}bg-amber-100{% else %}bg-red-100{% endif %} rounded-xl flex items-center justify-center">
+                {% if account.status == 'active' %}
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                {% elif account.status == 'pending' %}
+                <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                {% else %}
+                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                {% endif %}
+            </div>
+            <div>
+                <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Account Status</p>
+                <p class="text-xl font-bold mt-0.5 {% if account.status == 'active' %}text-green-700{% elif account.status == 'pending' %}text-amber-700{% elif account.status == 'frozen' %}text-red-700{% else %}text-slate-700{% endif %}">
+                    {{ account.status|capitalize }}
+                </p>
+            </div>
+        </div>
+        <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2">
+            <div class="h-1.5 rounded-full {% if account.status == 'active' %}bg-green-500 w-full{% elif account.status == 'pending' %}bg-amber-500 w-1/2{% else %}bg-red-500 w-full{% endif %}"></div>
+        </div>
+    </div>
+
+    <!-- Last Transaction -->
+    <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-card flex flex-col justify-center">
+        <div class="flex items-center gap-4 mb-3">
+            <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div>
+                <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Last Activity</p>
+                <p class="text-base font-bold text-slate-800 mt-0.5">
+                    {% if last_transaction %}
+                    {{ last_transaction.created_at.strftime('%d %b %Y') }}
+                    {% else %}
+                    None
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        {% if last_transaction %}
+        <p class="text-sm font-medium {% if last_transaction.transaction_type == 'credit' %}text-green-600{% else %}text-slate-600{% endif %}">
+            {% if last_transaction.transaction_type == 'credit' %}+{% else %}-{% endif %} ₹{{ '{:,.2f}'.format(last_transaction.amount) }}
+        </p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="mb-10 animate-fade-in" style="animation-delay: 0.2s;">
+    <h2 class="text-lg font-bold text-slate-800 mb-5 flex items-center gap-2">
+        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Quick Actions
+    </h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+        <a href="{{ url_for('customer.transfer') }}" class="bg-white rounded-2xl p-5 border border-slate-100 shadow-subtle hover:shadow-card hover:-translate-y-1 transition-all group text-center">
+            <div class="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary group-hover:text-white transition-colors">
+                <svg class="w-6 h-6 text-primary group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+            </div>
+            <h3 class="font-bold text-slate-800 text-sm">Send Money</h3>
+        </a>
+
+        <a href="{{ url_for('customer.beneficiaries') }}" class="bg-white rounded-2xl p-5 border border-slate-100 shadow-subtle hover:shadow-card hover:-translate-y-1 transition-all group text-center">
+            <div class="w-14 h-14 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                <svg class="w-6 h-6 text-indigo-600 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <h3 class="font-bold text-slate-800 text-sm">Beneficiaries</h3>
+        </a>
+
+        <a href="{{ url_for('customer.mini_statement') }}" class="bg-white rounded-2xl p-5 border border-slate-100 shadow-subtle hover:shadow-card hover:-translate-y-1 transition-all group text-center">
+            <div class="w-14 h-14 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-teal-600 group-hover:text-white transition-colors">
+                <svg class="w-6 h-6 text-teal-600 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </div>
+            <h3 class="font-bold text-slate-800 text-sm">Statement</h3>
+        </a>
+
+        <a href="{{ url_for('customer.transaction_history') }}" class="bg-white rounded-2xl p-5 border border-slate-100 shadow-subtle hover:shadow-card hover:-translate-y-1 transition-all group text-center">
+            <div class="w-14 h-14 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                <svg class="w-6 h-6 text-purple-600 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <h3 class="font-bold text-slate-800 text-sm">History</h3>
+        </a>
+    </div>
+</div>
+
+<!-- Recent Transactions -->
+<div class="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden animate-fade-in" style="animation-delay: 0.3s;">
+    <div class="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
+        <h2 class="text-lg font-bold text-slate-800">Recent Transactions</h2>
+        <a href="{{ url_for('customer.transaction_history') }}" class="text-sm text-primary font-bold hover:text-primary-dark transition-colors flex items-center gap-1">
+            View All <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
+    </div>
+
+    {% if recent_transactions %}
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="text-left text-xs text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-200">
+                    <th class="px-6 py-4 font-bold">Transaction Info</th>
+                    <th class="px-6 py-4 font-bold">Category</th>
+                    <th class="px-6 py-4 font-bold text-right">Amount</th>
+                    <th class="px-6 py-4 font-bold">Date</th>
+                    <th class="px-6 py-4 font-bold">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for txn in recent_transactions %}
+                <tr class="hover:bg-slate-50 transition-colors group">
+                    <td class="px-6 py-4">
+                        <p class="text-sm font-bold text-slate-800">{{ txn.description }}</p>
+                        <p class="text-xs text-slate-500 font-mono mt-0.5">Ref: {{ txn.transaction_id }}</p>
+                    </td>
+                    <td class="px-6 py-4">
+                        {% if txn.transaction_type == 'credit' %}
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-bold uppercase tracking-wider rounded-md border border-green-200">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg> Credit
+                        </span>
+                        {% elif txn.transaction_type == 'debit' %}
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-red-50 text-red-700 text-xs font-bold uppercase tracking-wider rounded-md border border-red-200">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg> Debit
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider rounded-md border border-blue-200">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg> Transfer
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <p class="text-sm font-bold {% if txn.transaction_type == 'credit' %}text-green-600{% else %}text-slate-800{% endif %}">
+                            {% if txn.transaction_type == 'credit' %}+{% else %}-{% endif %} ₹{{ '{:,.2f}'.format(txn.amount) }}
+                        </p>
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="text-sm font-medium text-slate-600">{{ txn.created_at.strftime('%d %b %Y') }}</p>
+                        <p class="text-xs text-slate-400">{{ txn.created_at.strftime('%I:%M %p') }}</p>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2.5 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full capitalize">{{ txn.status }}</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="p-12 text-center">
+        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800 mb-1">No Transactions Yet</h3>
+        <p class="text-slate-500 text-sm max-w-sm mx-auto">Your recent account activity will appear here once you start making transactions.</p>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

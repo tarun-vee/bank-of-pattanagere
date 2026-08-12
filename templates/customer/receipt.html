@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Transaction Receipt — Bank of Pattanagere{% endblock %}
+{% block page_title %}Receipt{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto mb-8 animate-fade-in">
+    <!-- Action Bar (Hidden when printing) -->
+    <div class="flex justify-end gap-3 mb-6 no-print">
+        <button onclick="window.print()" class="px-5 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-bold rounded-xl transition-colors flex items-center gap-2 shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            Print Receipt
+        </button>
+        <a href="{{ url_for('customer.receipt_pdf', transaction_id=txn.transaction_id) }}" class="px-5 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-bold rounded-xl transition-colors flex items-center gap-2 shadow-subtle">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Download PDF
+        </a>
+    </div>
+
+    <!-- Receipt Card -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-card p-8 md:p-10 relative overflow-hidden print:shadow-none print:border-none print:p-0" id="receipt">
+        
+        <!-- Background Watermark -->
+        <div class="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none print-watermark hidden">
+            <svg class="w-96 h-96" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 4.5l6.5 13h-13L12 6.5z"/></svg>
+        </div>
+
+        <div class="relative z-10">
+            <!-- Header -->
+            <div class="text-center mb-8 pb-8 border-b-2 border-slate-100 border-dashed">
+                <div class="flex items-center justify-center gap-4 mb-5">
+                    <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center shadow-md print:bg-white print:border-2 print:border-slate-800">
+                        <svg class="w-7 h-7 text-white print:text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l9-4 9 4v2H3V6z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10v8h3v-8M10 10v8h4v-8M17 10v8h3v-8M3 20h18"/>
+                        </svg>
+                    </div>
+                    <div class="text-left">
+                        <h2 class="text-2xl font-bold text-slate-800 leading-none">Bank of Pattanagere</h2>
+                        <p class="text-slate-500 text-[11px] font-bold uppercase tracking-[0.2em] mt-1">Official Transaction Receipt</p>
+                    </div>
+                </div>
+
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-green-50 border border-green-200 text-green-700 rounded-full">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                    <span class="text-sm font-bold uppercase tracking-wider">Transaction Successful</span>
+                </div>
+            </div>
+
+            <!-- Amount Section -->
+            <div class="text-center mb-8">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Transaction Amount</p>
+                <h1 class="text-4xl font-bold text-slate-800 tracking-tight">₹ {{ '{:,.2f}'.format(txn.amount) }}</h1>
+            </div>
+
+            <!-- Details Grid -->
+            <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 space-y-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-bold text-slate-500">Reference No.</span>
+                    <span class="text-sm font-mono font-bold text-slate-800">{{ reference_number }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-bold text-slate-500">Transaction ID</span>
+                    <span class="text-sm font-mono font-bold text-slate-800">{{ txn.transaction_id }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-bold text-slate-500">Date & Time</span>
+                    <span class="text-sm font-medium text-slate-800">{{ txn.created_at.strftime('%d %b %Y, %I:%M %p') }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-bold text-slate-500">Type</span>
+                    <span class="text-sm font-bold uppercase tracking-wider text-slate-800">{{ txn.transaction_type }}</span>
+                </div>
+
+                <div class="w-full h-px bg-slate-200 my-2"></div>
+
+                {% if txn.sender_account %}
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-bold text-slate-500">From Account</span>
+                    <div class="text-right">
+                        <span class="text-sm font-mono font-bold text-slate-800">{{ txn.sender_account }}</span>
+                        {% if sender_name %}<p class="text-xs text-slate-500 font-medium">{{ sender_name }}</p>{% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if txn.receiver_account %}
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-bold text-slate-500">To Account</span>
+                    <div class="text-right">
+                        <span class="text-sm font-mono font-bold text-slate-800">{{ txn.receiver_account }}</span>
+                        {% if receiver_name %}<p class="text-xs text-slate-500 font-medium">{{ receiver_name }}</p>{% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="w-full h-px bg-slate-200 my-2"></div>
+
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-bold text-slate-500">Remarks</span>
+                    <span class="text-sm font-medium text-slate-800">{{ txn.description }}</span>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-8 text-center border-t border-slate-100 pt-6">
+                <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Bank of Pattanagere — Head Office</p>
+                <p class="text-xs text-slate-400 mt-1">This is a computer-generated receipt and does not require a physical signature.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

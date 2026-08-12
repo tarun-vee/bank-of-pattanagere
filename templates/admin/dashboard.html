@@ -1,0 +1,209 @@
+{% extends 'base_admin.html' %}
+{% block title %}Admin Dashboard — Bank of Pattanagere{% endblock %}
+{% block page_title %}Overview{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative overflow-hidden group">
+            <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
+            <div class="flex items-center gap-4 relative z-10">
+                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shadow-sm border border-blue-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Customers</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ '{:,}'.format(total_customers) }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative overflow-hidden group">
+            <div class="absolute -right-6 -top-6 w-24 h-24 bg-green-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
+            <div class="flex items-center gap-4 relative z-10">
+                <div class="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center shadow-sm border border-green-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Accounts</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ '{:,}'.format(total_accounts) }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative overflow-hidden group">
+            <div class="absolute -right-6 -top-6 w-24 h-24 bg-purple-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
+            <div class="flex items-center gap-4 relative z-10">
+                <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center shadow-sm border border-purple-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Txns</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ '{:,}'.format(total_transactions) }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative overflow-hidden group">
+            <div class="absolute -right-6 -top-6 w-24 h-24 bg-yellow-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
+            <div class="flex items-center gap-4 relative z-10">
+                <div class="w-12 h-12 bg-yellow-50 text-yellow-600 rounded-xl flex items-center justify-center shadow-sm border border-yellow-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Bank Vault</p>
+                    <p class="text-xl font-bold text-slate-800 tracking-tight">₹{{ '{:,.0f}'.format(total_balance) }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Connections & Daily Volume -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-slate-800 rounded-2xl p-6 shadow-card relative overflow-hidden">
+            <div class="absolute right-0 top-0 h-full w-1/2 bg-gradient-to-l from-slate-700/50 to-transparent"></div>
+            <div class="flex justify-between items-center relative z-10">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Active Core Connections</p>
+                    <div class="flex items-end gap-3">
+                        <span class="text-4xl font-bold text-white">{{ active_tcp_clients }}</span>
+                        <span class="text-sm font-medium text-emerald-400 mb-1 flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Online
+                        </span>
+                    </div>
+                </div>
+                <div class="w-14 h-14 rounded-xl bg-slate-700/50 border border-slate-600 flex items-center justify-center text-teal-400">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"/></svg>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-primary-dark rounded-2xl p-6 shadow-card relative overflow-hidden">
+            <div class="absolute right-0 top-0 h-full w-1/2 bg-gradient-to-l from-primary/50 to-transparent"></div>
+            <div class="flex justify-between items-center relative z-10">
+                <div>
+                    <p class="text-xs font-bold text-blue-200 uppercase tracking-widest mb-1">Today's Transactions</p>
+                    <div class="flex items-end gap-3">
+                        <span class="text-4xl font-bold text-white">{{ todays_transfers }}</span>
+                        <span class="text-sm font-medium text-blue-200 mb-1">Processed</span>
+                    </div>
+                </div>
+                <div class="w-14 h-14 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if pending_count > 0 %}
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-8 flex items-center gap-4 shadow-sm">
+        <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+        </div>
+        <div>
+            <p class="font-bold text-amber-900">Action Required</p>
+            <p class="text-sm font-medium text-amber-700">{{ pending_count }} account(s) pending approval.</p>
+        </div>
+        <a href="{{ url_for('admin.customers', status='pending') }}" class="ml-auto px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold rounded-xl transition-colors shadow-sm whitespace-nowrap">Review Now</a>
+    </div>
+    {% endif %}
+
+    <!-- Announcement Form -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-card p-6 mb-8">
+        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+            Broadcast Announcement
+        </h3>
+        <form method="POST" action="{{ url_for('admin.send_announcement') }}" class="flex flex-col md:flex-row gap-4 items-start md:items-center">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="w-full md:w-1/3">
+                <input type="text" name="title" placeholder="Announcement Title" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all">
+            </div>
+            <div class="w-full md:flex-1">
+                <input type="text" name="message" placeholder="Message content to all active customers" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all">
+            </div>
+            <button type="submit" class="w-full md:w-auto px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-sm font-bold rounded-xl transition-colors shadow-subtle shrink-0">Send Broadcast</button>
+        </form>
+    </div>
+
+    <!-- Data Tables -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Recent Transactions -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
+                <h3 class="font-bold text-slate-800">Recent Transactions</h3>
+                <a href="{{ url_for('admin.transactions') }}" class="text-xs text-primary font-bold hover:text-primary-dark transition-colors">View All &rarr;</a>
+            </div>
+            <div class="overflow-x-auto flex-1">
+                <table class="w-full">
+                    <thead>
+                        <tr class="text-left text-xs text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-200">
+                            <th class="px-5 py-3 font-bold">ID</th>
+                            <th class="px-5 py-3 font-bold">Account</th>
+                            <th class="px-5 py-3 font-bold">Type</th>
+                            <th class="px-5 py-3 font-bold text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for txn in recent_transactions %}
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-5 py-3 font-mono text-xs text-slate-600">{{ txn.transaction_id }}</td>
+                            <td class="px-5 py-3 font-mono text-xs text-slate-800">{{ txn.sender_account or txn.receiver_account }}</td>
+                            <td class="px-5 py-3">
+                                {% if txn.transaction_type == 'credit' %}
+                                <span class="px-2 py-0.5 bg-green-50 text-green-700 border border-green-200 text-[10px] font-bold uppercase tracking-wider rounded">CR</span>
+                                {% else %}
+                                <span class="px-2 py-0.5 bg-red-50 text-red-700 border border-red-200 text-[10px] font-bold uppercase tracking-wider rounded">DR</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-5 py-3 font-bold text-sm text-right text-slate-800">₹ {{ '{:,.2f}'.format(txn.amount) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Registrations -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
+                <h3 class="font-bold text-slate-800">Recent Registrations</h3>
+                <a href="{{ url_for('admin.customers') }}" class="text-xs text-primary font-bold hover:text-primary-dark transition-colors">View All &rarr;</a>
+            </div>
+            <div class="overflow-x-auto flex-1">
+                <table class="w-full">
+                    <thead>
+                        <tr class="text-left text-xs text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-200">
+                            <th class="px-5 py-3 font-bold">Customer</th>
+                            <th class="px-5 py-3 font-bold">Account</th>
+                            <th class="px-5 py-3 font-bold">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for cust in recent_registrations %}
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-5 py-3">
+                                <p class="font-bold text-slate-800 text-sm">{{ cust.name }}</p>
+                                <p class="text-xs text-slate-500">{{ cust.created_at.strftime('%d %b %Y') }}</p>
+                            </td>
+                            <td class="px-5 py-3 font-mono text-xs text-slate-600">{{ cust.account.account_number if cust.account else 'N/A' }}</td>
+                            <td class="px-5 py-3">
+                                {% if cust.account %}
+                                    <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border 
+                                        {% if cust.account.status == 'active' %}bg-green-50 text-green-700 border-green-200
+                                        {% elif cust.account.status == 'pending' %}bg-amber-50 text-amber-700 border-amber-200
+                                        {% else %}bg-red-50 text-red-700 border-red-200{% endif %}">
+                                        {{ cust.account.status }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

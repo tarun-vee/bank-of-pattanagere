@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Mini Statement — Bank of Pattanagere{% endblock %}
+{% block page_title %}Mini Statement{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto animate-fade-in">
+    <!-- Professional Statement Header -->
+    <div class="bg-white rounded-t-2xl border-t border-l border-r border-slate-200 shadow-sm p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
+        <!-- Watermark -->
+        <div class="absolute right-0 top-0 w-64 h-64 opacity-[0.03] pointer-events-none transform translate-x-1/4 -translate-y-1/4">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20L12 2zm0 4.5l6.5 13h-13L12 6.5z"/></svg>
+        </div>
+        
+        <div class="relative z-10">
+            <h1 class="text-3xl font-bold text-slate-800 tracking-tight">Mini Statement</h1>
+            <p class="text-slate-500 font-medium mt-1">Recent 10 transactions</p>
+        </div>
+        <div class="flex gap-3 relative z-10">
+            <a href="{{ url_for('customer.download_statement', fmt='pdf') }}" class="px-5 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-bold rounded-xl transition-all shadow-subtle flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Download PDF
+            </a>
+            <a href="{{ url_for('customer.download_statement', fmt='csv') }}" class="px-5 py-2.5 bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 text-sm font-bold rounded-xl transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                Export CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- Account Information Panel -->
+    <div class="bg-slate-50 border-x border-slate-200 p-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div>
+            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Account Name</p>
+            <p class="text-base font-bold text-slate-800">{{ current_user.name }}</p>
+        </div>
+        <div>
+            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Account Number</p>
+            <p class="text-base font-mono font-bold tracking-wider text-primary">{{ account.account_number }}</p>
+        </div>
+        <div>
+            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Current Balance</p>
+            <p class="text-base font-bold text-green-600">₹ {{ '{:,.2f}'.format(account.balance) }}</p>
+        </div>
+    </div>
+
+    <!-- Statement Table -->
+    <div class="bg-white rounded-b-2xl border border-slate-200 shadow-card overflow-hidden">
+        {% if transactions %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="text-left text-xs text-slate-500 uppercase tracking-wider bg-slate-100 border-y border-slate-200">
+                        <th class="px-6 py-4 font-bold">Date & Time</th>
+                        <th class="px-6 py-4 font-bold">Description</th>
+                        <th class="px-6 py-4 font-bold text-center">Type</th>
+                        <th class="px-6 py-4 font-bold text-right">Amount (₹)</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for txn in transactions %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 text-sm font-medium text-slate-600 whitespace-nowrap">{{ txn.created_at.strftime('%d %b %Y, %H:%M') }}</td>
+                        <td class="px-6 py-4 text-sm font-bold text-slate-800">{{ txn.description }}</td>
+                        <td class="px-6 py-4 text-center">
+                            {% if txn.transaction_type == 'credit' %}
+                            <span class="px-2 py-1 bg-green-50 text-green-700 border border-green-200 text-[10px] font-bold uppercase tracking-wider rounded">CR</span>
+                            {% else %}
+                            <span class="px-2 py-1 bg-red-50 text-red-700 border border-red-200 text-[10px] font-bold uppercase tracking-wider rounded">DR</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm font-bold text-right {% if txn.transaction_type == 'credit' %}text-green-600{% else %}text-slate-800{% endif %}">
+                            {% if txn.transaction_type == 'credit' %}+{% else %}-{% endif %} {{ '{:,.2f}'.format(txn.amount) }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="p-4 bg-slate-50 border-t border-slate-200 text-center">
+            <p class="text-xs text-slate-500 font-medium">End of statement</p>
+        </div>
+        {% else %}
+        <div class="p-16 text-center border-t border-slate-200">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            </div>
+            <p class="text-slate-500 font-medium">No transactions found for this account.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

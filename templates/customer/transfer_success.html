@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Transfer Successful — Bank of Pattanagere{% endblock %}
+{% block page_title %}Transfer Status{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto mt-6">
+    <div class="bg-white rounded-2xl shadow-card border border-slate-200 overflow-hidden animate-fade-in relative">
+        <!-- Success Header -->
+        <div class="bg-green-600 p-10 text-center text-white relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-white opacity-10 rounded-full blur-2xl"></div>
+            <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-white opacity-10 rounded-full blur-2xl"></div>
+            
+            <div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-5 backdrop-blur-sm ring-8 ring-white/10">
+                <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <h1 class="text-3xl font-bold mb-2 tracking-tight">Transfer Successful</h1>
+            <p class="text-green-100 font-medium text-lg">₹ {{ '{:,.2f}'.format(txn.amount) }} has been sent securely.</p>
+        </div>
+
+        <!-- Details -->
+        <div class="p-8">
+            <div class="space-y-5 mb-8">
+                <div class="flex flex-col sm:flex-row sm:justify-between pb-4 border-b border-slate-100 border-dashed">
+                    <span class="text-slate-500 font-medium mb-1 sm:mb-0">Transaction Ref</span>
+                    <span class="font-mono font-bold text-slate-800">{{ txn.transaction_id }}</span>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:justify-between pb-4 border-b border-slate-100 border-dashed">
+                    <span class="text-slate-500 font-medium mb-1 sm:mb-0">Network Reference</span>
+                    <span class="font-mono font-bold text-slate-800">{{ reference_number }}</span>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:justify-between pb-4 border-b border-slate-100 border-dashed">
+                    <span class="text-slate-500 font-medium mb-1 sm:mb-0">Sent To</span>
+                    <div class="text-left sm:text-right">
+                        <p class="font-mono font-bold text-slate-800">{{ txn.receiver_account }}</p>
+                        {% if receiver_name %}<p class="text-slate-500 font-medium text-sm mt-0.5">{{ receiver_name }}</p>{% endif %}
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:justify-between pb-4 border-b border-slate-100 border-dashed">
+                    <span class="text-slate-500 font-medium mb-1 sm:mb-0">Date & Time</span>
+                    <span class="font-medium text-slate-800">{{ txn.created_at.strftime('%d %b %Y, %I:%M %p') }}</span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                <a href="{{ url_for('customer.receipt', transaction_id=txn.transaction_id) }}"
+                    class="py-3.5 px-4 bg-white border border-slate-200 hover:border-primary hover:text-primary text-slate-700 font-bold rounded-xl transition-colors text-center flex items-center justify-center gap-2 shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Receipt
+                </a>
+                <a href="{{ url_for('customer.transaction_history') }}"
+                    class="py-3.5 px-4 bg-white border border-slate-200 hover:border-primary hover:text-primary text-slate-700 font-bold rounded-xl transition-colors text-center flex items-center justify-center gap-2 shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    History
+                </a>
+                <a href="{{ url_for('customer.dashboard') }}"
+                    class="py-3.5 px-4 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all text-center flex items-center justify-center gap-2 shadow-card active:scale-[0.98]">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+                    Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
